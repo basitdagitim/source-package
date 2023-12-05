@@ -45,17 +45,17 @@ mkdir -p $HOME/distro/initrd/lib/modules/
 mkdir -p $HOME/distro/initrd/lib/modules/$(uname -r)
 mkdir -p $HOME/distro/initrd/lib/modules/$(uname -r)/moduller
 
-for directory in {crypto,fs,lib} \
-   drivers/{block,ata,md,firewire,ahci,sd} \
-    drivers/{scsi,message,pcmcia,virtio} \
-    drivers/usb/{host,storage}; 
-    	do
+#for directory in {crypto,fs,lib} \
+#   drivers/{block,ata,md,firewire,ahci,sd} \
+ #   drivers/{scsi,message,pcmcia,virtio} \
+  #  drivers/usb/{host,storage}; 
+   # 	do
     	#echo ${directory}
     	#    misc \
-   find /lib/modules/$(uname -r)/kernel/${directory}/ -type f \
-        -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
-	done
-#cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
+   #find /lib/modules/$(uname -r)/kernel/${directory}/ -type f \
+    #    -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
+	#done
+cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
 
 /sbin/depmod --all --basedir=$HOME/distro/initrd #modul indeksi oluşturluyor
 #*****************kurallar yüklenecek*************************
@@ -128,13 +128,7 @@ mkdir -p $HOME/distro/initrd/usr
 mkdir -p $HOME/distro/initrd/usr/share
 mkdir -p $HOME/distro/initrd/usr/share/udhcpc
 
-cat >  $HOME/distro/initrd/usr/share/udhcpc/udhcpc.sh << EOF
-#!/bin/sh
-ip addr add $ip/$mask dev $interface
-if [ "$router" ] ; then
-  ip route add default via $router dev $interface
-fi
-EOF
+
 #**************************init dosyası oluşturuluyor***********************************
 
 cat >  $HOME/distro/initrd/init << EOF
@@ -157,6 +151,9 @@ mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 mount -t tmpfs tmpfs /tmp
 
+./runudev
+./newipeth0
+
 #udevd --daemon --resolve-names=never #modprobe yerine kullanılıyor
 #udevadm trigger --type=subsystems --action=add
 #udevadm trigger --type=devices --action=add
@@ -165,6 +162,7 @@ mount -t tmpfs tmpfs /tmp
 #ethernet ip alması
 #ip link set eth0 up
 #udhcpc -i eth0 -s udhcpc.sh
+
 #disk işlemleri
 #echo "Disk İşlemleri......."
 #modprobe ext4
@@ -178,15 +176,6 @@ echo "deneme"
 #/bin/busybox ash
 /bin/bash
 
-EOF
-
-cat >  $HOME/distro/initrd/runudev << EOF
-#!/bin/sh
-
-udevd --daemon --resolve-names=never #modprobe yerine kullanılıyor
-udevadm trigger --type=subsystems --action=add
-udevadm trigger --type=devices --action=add
-udevadm settle || true
 EOF
 
 
@@ -215,7 +204,7 @@ mv $HOME/distro/filesystem.squashfs $HOME/distro/iso/live/filesystem.squashfs
 
 #grub menüsü oluşturuluyor..
 cat > $HOME/distro/iso/boot/grub/grub.cfg << EOF
-linux /boot/vmlinuz
+linux /boot/vmlinuz net.ifnames=0 biosdevname=0
 initrd /boot/initrd.img
 boot boot=live
 EOF

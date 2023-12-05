@@ -17,5 +17,44 @@ cat > ./etc/resolv.conf << EOF
 nameserver 8.8.8.8
 nameserver 8.8.4.4
 EOF
+#******************************test*************************************
+cat > ./curlindir << EOF
+curl -Lk -o test.deb https://github.com/bayramkarahan/wineplugin/raw/master/winemimetype.deb
+EOF
+chmod 755 ./curlindir
 
+#******************************ip alma*************************************
+cat > ./newipeth0 << EOF
+ip link set eth0 up
+udhcpc -i eth0 -s /usr/share/udhcpc/udhcpc.sh
+EOF
+chmod 755 ./newipeth0
+
+
+#******************************udhcpc.sh*************************************
+mkdir -p usr
+mkdir -p usr/share
+mkdir -p usr/share/udhcpc
+
+cat >  ./usr/share/udhcpc/udhcpc.sh << EOF
+#!/bin/sh
+ip addr add \$ip/\$mask dev \$interface
+if [ "\$router" ] ; then
+  ip route add default via \$router dev \$interface
+fi
+EOF
+chmod 755 ./usr/share/udhcpc/udhcpc.sh
+
+#******************************runudev*************************************
+cat >  ./runudev << EOF
+#!/bin/sh
+
+udevd --daemon --resolve-names=never #modprobe yerine kullanılıyor
+udevadm trigger --type=subsystems --action=add
+udevadm trigger --type=devices --action=add
+udevadm settle || true
+EOF
+chmod 755 ./runudev
+
+#******************************copy*************************************
 cp $HOME/distro/${name}-${version}/* -rf $HOME/rootfs
