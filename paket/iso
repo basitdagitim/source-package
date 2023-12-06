@@ -1,4 +1,25 @@
 #!/bin/bash
+
+moduller()
+{
+for directory in ${@};
+    	do
+    	data=$(/sbin/modprobe --show-depends ${directory}|cut -d'/' -f8|cut -d'.' -f1)
+    	datas=$(echo $data | tr " " "\n")
+    	bs=0
+	    	for item in ${datas[@]}
+	    	do
+	    	
+	    	##echo $item
+	    	 find /lib/modules/$(uname -r)/kernel/${item}/ -type f \
+        -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
+
+	    	done
+	    	
+	    	
+	done
+}
+
 rm -rf $HOME/distro/iso
 rm -rf $HOME/distro/initrd
 
@@ -44,6 +65,7 @@ ln -s kmod rmmod
 mkdir -p $HOME/distro/initrd/lib/modules/
 mkdir -p $HOME/distro/initrd/lib/modules/$(uname -r)
 mkdir -p $HOME/distro/initrd/lib/modules/$(uname -r)/moduller
+moduller {cdrom,loop,md,ahci,block,ata,firewire,sd,scsi,message,pcmcia,virtio,host,storage,crypto,fs,lib}
 
 #for directory in {crypto,fs,lib} \
 #   drivers/{block,ata,md,firewire,ahci,sd} \
@@ -55,7 +77,7 @@ mkdir -p $HOME/distro/initrd/lib/modules/$(uname -r)/moduller
    #find /lib/modules/$(uname -r)/kernel/${directory}/ -type f \
     #    -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
 	#done
-cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
+#cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
 
 /sbin/depmod --all --basedir=$HOME/distro/initrd #modul indeksi oluşturluyor
 #*****************kurallar yüklenecek*************************
