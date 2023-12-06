@@ -4,14 +4,14 @@ moduller()
 {
 for directory in ${@};
     	do
-    	data=$(/sbin/modprobe --show-depends ${directory}|cut -d'/' -f8|cut -d'.' -f1)
+    	data=$(/sbin/modprobe --show-depends ${directory}|cut -d'/' -f8)
     	datas=$(echo $data | tr " " "\n")
     	bs=0
 	    	for item in ${datas[@]}
 	    	do
 	    	
 	    	##echo $item
-	    	 find /lib/modules/$(uname -r)/kernel/${item}/ -type f \
+	find /lib/modules/$(uname -r)/kernel/ -type f  -name "${item}"\
         -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
 
 	    	done
@@ -65,19 +65,20 @@ ln -s kmod rmmod
 mkdir -p $HOME/distro/initrd/lib/modules/
 mkdir -p $HOME/distro/initrd/lib/modules/$(uname -r)
 mkdir -p $HOME/distro/initrd/lib/modules/$(uname -r)/moduller
-moduller {cdrom,loop,md,ahci,block,ata,firewire,sd,scsi,message,pcmcia,virtio,host,storage,crypto,fs,lib}
+#moduller {cdrom,loop,md,ahci,block,ata,firewire,sd,scsi,message,pcmcia,virtio,host}
+#moduller {storage,crypto,fs,lib,dm-snapshot,overlay,isofs,squashfs,hfsplus,sr_mod,dm_mod}
+#moduller {nls,nls_utf8,overlayfs,udf,ext4,usb-storage}
 
-#for directory in {crypto,fs,lib} \
-#   drivers/{block,ata,md,firewire,ahci,sd} \
- #   drivers/{scsi,message,pcmcia,virtio} \
-  #  drivers/usb/{host,storage}; 
-   # 	do
+#for directory in {lib,fs,crypto,net} \
+#   drivers/{usb,block,ata,md,firewire} \
+#    drivers/{scsi,message,pcmcia,virtio} ;
+#   	do
     	#echo ${directory}
     	#    misc \
-   #find /lib/modules/$(uname -r)/kernel/${directory}/ -type f \
-    #    -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
-	#done
-#cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
+#  find /lib/modules/$(uname -r)/kernel/${directory}/ -type f \
+#      -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
+#	done
+cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
 
 /sbin/depmod --all --basedir=$HOME/distro/initrd #modul indeksi oluşturluyor
 #*****************kurallar yüklenecek*************************
@@ -138,6 +139,19 @@ make install DESTDIR=$HOME/distro/initrd
 cd $HOME/distro/build-xz-5.4.5
 make install DESTDIR=$HOME/distro/initrd
 
+#*************************liblzma-xz kopyalanıyor*************************
+cd $HOME/distro/bzip2-1.0.8
+make install DESTDIR=$HOME/distro/initrd
+cp -v bzip2-shared $HOME/distro/initrd/bin/bzip2
+cp -av libbz2.so* $HOME/distro/initrd/lib
+ln -sv $HOME/distro/initrd/lib/libbz2.so.1.0 $HOME/distro/initrd/usr/lib/libbz2.so
+rm -v $HOME/rootfs/initrd/bin/{bunzip2,bzcat,bzip2}
+ln -sv $HOME/distro/initrd/bzip2 $HOME/rootfs/initrd/bin/bunzip2
+ln -sv $HOME/distro/initrd/bzip2 $HOME/rootfs/initrd/bin/bzcat
+#*************************libexpat kopyalanıyor*************************
+cd $HOME/distro/build-expat-2.5.0
+make install DESTDIR=$HOME/distro/initrd
+
 #*************************libxml2 kopyalanıyor*************************
 cd $HOME/distro/build-libxml2-2.12.1
 make install DESTDIR=$HOME/distro/initrd
@@ -173,8 +187,8 @@ mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 mount -t tmpfs tmpfs /tmp
 
-./runudev
-./newipeth0
+./runudev&
+./newipeth0&
 
 #udevd --daemon --resolve-names=never #modprobe yerine kullanılıyor
 #udevadm trigger --type=subsystems --action=add
