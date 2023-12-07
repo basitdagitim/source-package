@@ -86,11 +86,11 @@ mkdir -p $HOME/distro/initrd/etc/udev/
 mkdir -p $HOME/distro/initrd/lib/udev/
 cp /etc/udev/rules.d -rf  $HOME/distro/initrd/etc/udev/
 cp /lib/udev/rules.d -rf  $HOME/distro/initrd/lib/udev/
-rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-drivers.rules
-rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-debian-compat.rules
-rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-net-setup-link.rules
-rm -rf $HOME/distro/initrd/lib/udev/rules.d/90-nm-thunderbolt.rules
-rm -rf $HOME/distro/initrd/lib/udev/rules.d/73-seat-late.rules
+#rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-drivers.rules
+#rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-debian-compat.rules
+#rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-net-setup-link.rules
+#rm -rf $HOME/distro/initrd/lib/udev/rules.d/90-nm-thunderbolt.rules
+#rm -rf $HOME/distro/initrd/lib/udev/rules.d/73-seat-late.rules
 #***************************udevd-udevadm**********************
 cd $HOME/distro/build-eudev-3.2.14
 make install DESTDIR=$HOME/distro/initrd
@@ -118,6 +118,10 @@ cp $HOME/distro/base-files-0/* -rf $HOME/distro/initrd
 #*************************curl kopyalanıyor*************************
 cd $HOME/distro/build-curl-8.4.0
 make install DESTDIR=$HOME/distro/initrd
+ for ver in 3 4.0.0 4.1.0 4.2.0 4.3.0 4.4.0 4.5.0 4.6.0 4.7.0; do
+        ln -s $HOME/distro/initrd/lib/libcurl.so.4.8.0 $HOME/distro/initrd/lib/libcurl.so.${ver}
+    done
+    
 #*************************openssl kopyalanıyor*************************
 cd $HOME/distro/build-openssl-3.2.0
 make install DESTDIR=$HOME/distro/initrd
@@ -187,8 +191,8 @@ mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 mount -t tmpfs tmpfs /tmp
 
-./runudev&
-./newipeth0&
+./runudev
+#./newipeth0
 
 #udevd --daemon --resolve-names=never #modprobe yerine kullanılıyor
 #udevadm trigger --type=subsystems --action=add
