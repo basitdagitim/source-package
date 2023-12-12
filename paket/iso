@@ -22,22 +22,25 @@ for directory in ${@};
 
 rm -rf $HOME/distro/iso
 rm -rf $HOME/distro/initrd
-
+#bash ./initrd
 #*****************glibc hazırlanmalı************************
 cd $HOME/distro/build-glibc-2.38
 make install DESTDIR=$HOME/distro/initrd
 cd $HOME/distro/initrd/
 ln -s lib lib64
 
-#***************************bash**********************
+#***************************readline**********************
 cd $HOME/distro/build-readline-8.1
 make install DESTDIR=$HOME/distro/initrd
 
+#***************************ncurses**********************
 cd $HOME/distro/build-ncurses-6.4
 make install DESTDIR=$HOME/distro/initrd
 cd $HOME/distro/initrd/lib
-ln -s libncurses.so.6 libtinfo.so.6
-
+ln -s libncursesw.so.6 libtinfow.so.6
+ln -s libncursesw.so.6 libtinfo.so.6
+ln -s libncursesw.so.6 libncurses.so.6
+#***************************bash**********************
 cd $HOME/distro/build-bash-5.2.21
 make install DESTDIR=$HOME/distro/initrd
 
@@ -99,10 +102,12 @@ make install DESTDIR=$HOME/distro/initrd
 cd $HOME/distro/build-util-linux-2.39
 make install DESTDIR=$HOME/distro/initrd
 cp .libs/* -rf $HOME/distro/initrd/lib/
+cp $HOME/distro/initrd/lib/cfdisk $HOME/distro/initrd/bin/
 #***************************nano**********************
 cd $HOME/distro/build-nano-7.2
 make install DESTDIR=$HOME/distro/initrd
 cd $HOME/distro/initrd
+cp $HOME/distro/initrd/bin/nano $HOME/distro/initrd/sbin/nano 
 echo "INPUT(-lncursesw)" > $LFS/lib/libncurses.so
 #******************libarchive**********************
 cd $HOME/distro/build-libarchive-3.7.2
@@ -160,9 +165,26 @@ make install DESTDIR=$HOME/distro/initrd
 cd $HOME/distro/build-libxml2-2.12.1
 make install DESTDIR=$HOME/distro/initrd
 
+#*************************grub kopyalanıyor*************************
+cd $HOME/distro/build-grub-2.06
+make install DESTDIR=$HOME/distro/initrd
+
+#*************************rsync kopyalanıyor*************************
+cd $HOME/distro/build-rsync-3.2.7
+make install DESTDIR=$HOME/distro/initrd
+
+#*************************e2fsprogs kopyalanıyor*************************
+cd $HOME/distro/build-e2fsprogs-1.47.0
+make install DESTDIR=$HOME/distro/initrd
+
+#*************************dialog kopyalanıyor*************************
+cd $HOME/distro/build-dialog-1.3-20230209
+make install DESTDIR=$HOME/distro/initrd
+
 #*************************live-boot*************************
 #cd $HOME/distro/live-boot
 #make install DESTDIR=$HOME/distro/initrd
+
 #********************udhcpc**************************
 mkdir -p $HOME/distro/initrd/usr
 mkdir -p $HOME/distro/initrd/usr/share
@@ -176,7 +198,7 @@ cat >  $HOME/distro/initrd/init << EOF
 /bin/busybox mkdir -p /bin
 /bin/busybox --install -s /bin
 #**********************************
-export PATH=/sbin:/bin:/usr/bin:/usr/sbin
+export PATH=/sbin:/bin:/usr/bin:/usr/sbin:/bbin:
 
 [ -d /dev ]  || mkdir -m 0755 /dev
 [ -d /root ] || mkdir -m 0700 /root
@@ -232,15 +254,17 @@ mkdir -p $HOME/distro/iso/boot
 mkdir -p $HOME/distro/iso/boot/grub
 mkdir -p $HOME/distro/iso/live || true
 
-#iso dizinine vmlinuz ve initrd.img dosyamız kopyalanıyor
-#cp $HOME/distro/linux-6.6.2/arch/x86/boot/bzImage $HOME/distro/iso/boot/vmlinuz 
-cp /boot/vmlinuz-$(uname -r) $HOME/distro/iso/boot/vmlinuz  #sistemde kullandığım kerneli kopyaladım istenirde kernel derlenebilir.
-mv $HOME/distro/initrd.img $HOME/distro/iso/boot/initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
 
 #squashfs dosyası oluşturuluyor iso dzinine kopyalanıyor
 cd $HOME/distro/
 mksquashfs initrd $HOME/distro/filesystem.squashfs -comp xz -wildcards
 mv $HOME/distro/filesystem.squashfs $HOME/distro/iso/live/filesystem.squashfs
+
+#iso dizinine vmlinuz ve initrd.img dosyamız kopyalanıyor
+#cp $HOME/distro/linux-6.6.2/arch/x86/boot/bzImage $HOME/distro/iso/boot/vmlinuz 
+cp /boot/vmlinuz-$(uname -r) $HOME/distro/iso/boot/vmlinuz  #sistemde kullandığım kerneli kopyaladım istenirde kernel derlenebilir.
+mv $HOME/distro/initrd.img $HOME/distro/iso/boot/initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
+
 
 #grub menüsü oluşturuluyor..
 cat > $HOME/distro/iso/boot/grub/grub.cfg << EOF
@@ -248,6 +272,9 @@ linux /boot/vmlinuz net.ifnames=0 biosdevname=0
 initrd /boot/initrd.img
 boot boot=live
 EOF
+
+
+#cp -prfv $HOME/distro/iso/boot /$HOME/distro/initrd/
 
 #echo 'menuentry "Live GNU/Linux 64-bit" --class live {' > $HOME/distro/iso/boot/grub/grub.cfg
 #echo '    linux /boot/vmlinuz boot=live quiet live-config --' >> liveiso/boot/grub/grub.cfg

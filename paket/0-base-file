@@ -17,6 +17,15 @@ cat > ./etc/resolv.conf << EOF
 nameserver 8.8.8.8
 nameserver 8.8.4.4
 EOF
+cat > ./etc/ld.so.conf << EOF
+/usr/local/lib64
+/usr/local/lib
+include /etc/ld.so.conf.d/*.conf
+/usr/lib64
+/usr/lib
+/lib64
+/lib
+EOF
 #******************************test*************************************
 cat > ./curlindir << EOF
 curl -Lk -o test.deb https://github.com/bayramkarahan/wineplugin/raw/master/winemimetype.deb
@@ -46,7 +55,7 @@ EOF
 chmod 755 ./usr/share/udhcpc/udhcpc.sh
 
 #******************************runudev*************************************
-cat >  ./runudev << EOF
+cat >  ./udv << EOF
 #!/bin/sh
 
 udevd --daemon --resolve-names=never #modprobe yerine kullanılıyor
@@ -54,7 +63,7 @@ udevadm trigger --type=subsystems --action=add
 udevadm trigger --type=devices --action=add
 udevadm settle || true
 EOF
-chmod 755 ./runudev
+chmod 755 ./udv
 
 #******************************copy*************************************
 cp $HOME/distro/${name}-${version}/* -rf $HOME/rootfs
