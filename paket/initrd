@@ -65,8 +65,8 @@ mkdir -p $HOME/distro/$boot/lib/modules/$(uname -r)/moduller
 #  find /lib/modules/$(uname -r)/kernel/${directory}/ -type f \
 #      -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
 #	done
-#cp $HOME/boot/initrd/lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/$boot/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
-cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/$boot/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
+cp $HOME/boot/initrd/lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/$boot/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
+#cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/$boot/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
 /sbin/depmod --all --basedir=$HOME/distro/boot #modul indeksi oluşturluyor
 #*****************kurallar yüklenecek*************************
 mkdir -p $HOME/distro/$boot/etc/udev/
@@ -87,6 +87,36 @@ cd $HOME/distro/build-util-linux-2.39
 make install DESTDIR=$HOME/distro/$boot
 cp .libs/* -rf $HOME/distro/$boot/lib/
 cp $HOME/distro/$boot/lib/cfdisk $HOME/distro/$boot/bin/
+
+#******************libarchive**********************
+cd $HOME/distro/build-libarchive-3.7.2
+make install DESTDIR=$HOME/distro/$boot
+
+#******************libcapng**********************
+cd $HOME/distro/build-libcap-ng-0.8.3
+make install DESTDIR=$HOME/distro/$boot
+
+#*************************libzstd kopyalanıyor*************************
+cd $HOME/distro/zstd-1.5.5-kernel
+make install DESTDIR=$HOME/distro/$boot
+cp $HOME/distro/$boot/usr/local/* -rf $HOME/distro/$boot/
+
+#*************************zlib kopyalanıyor*************************
+cd $HOME/distro/build-zlib-1.3
+make install DESTDIR=$HOME/distro/$boot
+#*************************liblzma-xz kopyalanıyor*************************
+cd $HOME/distro/build-xz-5.4.5
+make install DESTDIR=$HOME/distro/$boot
+
+#*************************liblzma-xz kopyalanıyor*************************
+cd $HOME/distro/bzip2-1.0.8
+make install DESTDIR=$HOME/distro/$boot
+cp -v bzip2-shared $HOME/distro/$boot/bin/bzip2
+cp -av libbz2.so* $HOME/distro/$boot/lib
+ln -sv $HOME/distro/$boot/lib/libbz2.so.1.0 $HOME/distro/$boot/usr/lib/libbz2.so
+rm -v $HOME/rootfs/$boot/bin/{bunzip2,bzcat,bzip2}
+ln -sv $HOME/distro/$boot/bzip2 $HOME/rootfs/$boot/bin/bunzip2
+ln -sv $HOME/distro/$boot/bzip2 $HOME/rootfs/$boot/bin/bzcat
 
 #*************************base-file kopyalanıyor*************************
 cp $HOME/distro/base-files-0/* -rf $HOME/distro/$boot
@@ -165,9 +195,9 @@ mkdir -p $HOME/distro/iso/live || true
 #iso dizinine vmlinuz ve initrd.img dosyamız kopyalanıyor
 #cp $HOME/distro/linux-6.6.2/arch/x86/boot/bzImage $HOME/distro/iso/boot/vmlinuz 
 cp $HOME/boot/vmlinuz-$(uname -r) $HOME/distro/iso/boot/vmlinuz  #sistemde kullandığım kerneli kopyaladım istenirde kernel derlenebilir.
-##zstd  $HOME/distro/boot-initrd.img -8
-##mv $HOME/distro/boot-initrd.img.zst $HOME/distro/iso/boot/initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
-mv $HOME/distro/boot-initrd.img $HOME/distro/iso/boot/initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
+zstd  $HOME/distro/boot-initrd.img -8
+mv $HOME/distro/boot-initrd.img.zst $HOME/distro/iso/boot/initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
+#mv $HOME/distro/boot-initrd.img $HOME/distro/iso/boot/initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
 
 #grub menüsü oluşturuluyor..
 cat > $HOME/distro/iso/boot/grub/grub.cfg << EOF

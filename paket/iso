@@ -256,12 +256,12 @@ mkdir -p $HOME/distro/iso/live || true
 
 
 #squashfs dosyası oluşturuluyor iso dzinine kopyalanıyor
+#cp -prfv $HOME/distro/iso/boot /$HOME/distro/initrd/
 cd $HOME/distro/
 mksquashfs initrd $HOME/distro/filesystem.squashfs -comp xz -wildcards
 mv $HOME/distro/filesystem.squashfs $HOME/distro/iso/live/filesystem.squashfs
 
 #iso dizinine vmlinuz ve initrd.img dosyamız kopyalanıyor
-#cp $HOME/distro/linux-6.6.2/arch/x86/boot/bzImage $HOME/distro/iso/boot/vmlinuz 
 cp /boot/vmlinuz-$(uname -r) $HOME/distro/iso/boot/vmlinuz  #sistemde kullandığım kerneli kopyaladım istenirde kernel derlenebilir.
 mv $HOME/distro/initrd.img $HOME/distro/iso/boot/initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
 
@@ -274,7 +274,7 @@ boot boot=live
 EOF
 
 
-#cp -prfv $HOME/distro/iso/boot /$HOME/distro/initrd/
+
 
 #echo 'menuentry "Live GNU/Linux 64-bit" --class live {' > $HOME/distro/iso/boot/grub/grub.cfg
 #echo '    linux /boot/vmlinuz boot=live quiet live-config --' >> liveiso/boot/grub/grub.cfg

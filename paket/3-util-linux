@@ -33,11 +33,11 @@ cd build-${name}-${version}
 	--without-systemd \
 	--without-libuser \
 	--without-utempter \
-	--without-econf
+	--without-econf \
 	--enable-libmount \
 	--enable-libblkid 
 
 make 
 
 make install DESTDIR=$HOME/rootfs
-mv .libs/* $HOME/rootfs/lib/
+#cp -prfv .libs/* $HOME/rootfs/lib/
