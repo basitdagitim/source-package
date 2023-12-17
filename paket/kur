@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+dosya=$1
+paket=${dosya::-4}
+
+mkdir -p /tmp/bps
+mkdir -p /tmp/bps/kur
+#mkdir -p /var/lib/bps
+cp ${dosya} /tmp/bps/kur/
+cd /tmp/bps/kur/
+tar -xf ${dosya}
+cd rootfs-${paket}
+find .
+cd ..
+#cp ${paket}.index /var/lib/bps/${paket}.index
+

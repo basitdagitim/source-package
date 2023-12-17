@@ -1,0 +1,48 @@
+version="0"
+name="base-files"
+
+dir=$(pwd)
+mkdir -p /tmp/bps
+cd /tmp/bps
+
+rm -rf build-${name}-${version}*
+rm -rf ${name}-${version}*
+mkdir -p ${name}-${version}
+mkdir -p build-${name}-${version}
+cd build-${name}-${version}
+
+#******************************ip alma*************************************
+cat > ./newipeth0 << EOF
+ip link set eth0 up
+udhcpc -i eth0 -s /usr/share/udhcpc/udhcpc.sh
+EOF
+chmod 755 ./newipeth0
+
+
+#******************************udhcpc.sh*************************************
+mkdir -p usr
+mkdir -p usr/share
+mkdir -p usr/share/udhcpc
+
+cat >  ./usr/share/udhcpc/udhcpc.sh << EOF
+#!/bin/sh
+ip addr add \$ip/\$mask dev \$interface
+if [ "\$router" ] ; then
+  ip route add default via \$router dev \$interface
+fi
+EOF
+chmod 755 ./usr/share/udhcpc/udhcpc.sh
+
+#******************************build*************************************
+cp /tmp/bps/build-${name}-${version}/* -rf /tmp/bps/${name}-${version}
+#*******************************xz compress*******************************
+cd /tmp/bps
+find ${name}-${version}/*>${name}-${version}.index
+tar -cf ${name}-${version}.tar ${name}-${version}/* ${name}-${version}.index
+
+xz -9 ${name}-${version}.tar
+
+mv ${name}-${version}.tar.xz ${dir}/${name}-${version}.bps
+
+#rm -rf build-${name}-${version}*
+#rm -rf ${name}-${version}*
