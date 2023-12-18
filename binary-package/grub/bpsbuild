@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+version="2.06"
+name="grub"
+depends="glibc,readline,ncurses"
+description="sistem grub yükleme paketi"
+source="ftp://ftp.gnu.org/gnu/grub/${name}-${version}.tar.gz"
+groups="sys.boot"
+setup()
+{
+	../${name}-${version}/configure --prefix= \
+            --sysconfdir=/etc \
+            --libdir=/lib/ \
+            --disable-werror 
+
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+
