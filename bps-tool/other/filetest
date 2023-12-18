@@ -1,0 +1,10 @@
+#!/bin/bash
+i=$1
+echo "test"
+    type=`file -b $i | awk '{print $2}'`
+    echo $type
+    if  [[ $type = shell ]];then
+        echo $i is a shell script
+    fi
+
+

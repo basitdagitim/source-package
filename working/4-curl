@@ -1,0 +1,46 @@
+version="8.4.0"
+name="curl"
+
+mkdir -p $HOME/distro
+cd $HOME/distro
+rm -rf ${name}-${version}
+rm -rf build-${name}-${version}
+
+wget https://curl.se/download/${name}-${version}.tar.xz
+tar -xvf ${name}-${version}.tar.xz
+
+mkdir build-${name}-${version}
+
+cd build-${name}-${version}
+
+ opts=(
+        --prefix=/
+        --libdir=/lib
+        --disable-ldap
+        --disable-ldaps
+        --disable-versioned-symbols
+        --enable-doh
+        --enable-ftp
+        --enable-ipv6
+        --with-ca-path=/etc/ssl/certs
+        --with-ca-bundle=/etc/ssl/cert.pem
+        --enable-threaded-resolverl
+        --enable-websockets
+        $(use_opt zstd --with-zstd --without-zstd)
+        $(use_opt zlib --with-zlib --without-zlib)
+        $(use_opt brotli --with-brotli --without-brotli)
+        $(use_opt libssh --with-libssh --without-libssh)
+        $(use_opt libidn2 --with-libidn2 --without-libidn2)
+    )
+../${name}-${version}/configure ${opts[@]} --with-openssl
+
+
+make 
+
+make install DESTDIR=$HOME/rootfs
+
+  for ver in 3 4.0.0 4.1.0 4.2.0 4.3.0 4.4.0 4.5.0 4.6.0 4.7.0; do
+        ln -s $HOME/rootfs/lib/libcurl.so.4.8.0 $HOME/rootfs/lib/libcurl.so.${ver}
+    done
+
+

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+version="8.1"
+name="readline"
+depends="glibc"
+description="readline kütüphanesi"
+source="https://ftp.gnu.org/pub/gnu/readline/${name}-${version}.tar.gz"
+groups="sys.apps"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ --enable-shared --enable-multibyte
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

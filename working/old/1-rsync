@@ -1,0 +1,31 @@
+version="3.2.7"
+name="rsync"
+
+mkdir -p $HOME/distro
+cd $HOME/distro
+rm -rf ${name}-${version}
+rm -rf build-${name}-${version}
+
+wget https://download.samba.org/pub/rsync/src/${name}-${version}.tar.gz
+tar -xvf ${name}-${version}.tar.gz
+
+mkdir build-${name}-${version}
+
+cd build-${name}-${version}
+
+../${name}-${version}/configure --prefix=/ \
+        --libdir=/lib/ \
+        --with-included-popt \
+        --with-included-zlib \
+        --disable-xxhash \
+    	--disable-lz4
+
+	#$(use_opt zstd --enable-zstd --disable-zstd) \
+    	#$(use_opt xxhash --enable-xxhash --disable-xxhash)
+
+make 
+
+make install DESTDIR=$HOME/rootfs
+
+
+

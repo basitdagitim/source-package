@@ -1,0 +1,50 @@
+version="8.4.0"
+name="curl-gnutls"
+
+mkdir -p $HOME/distro
+cd $HOME/distro
+rm -rf ${name}-${version}
+rm -rf build-${name}-${version}
+glibc-->op
+
+wget https://curl.se/download/curl-${version}.tar.xz
+tar -xvf curl-${version}.tar.xz
+mv curl-${version} ${name}-${version}
+
+mkdir build-${name}-${version}
+
+cd build-${name}-${version}
+
+opts=(
+        --prefix=/
+        --libdir=/lib
+        --disable-ldap
+        --disable-ldaps
+        --disable-versioned-symbols
+        --disable-doh
+        --disable-ftp
+        --disable-ipv6
+        --with-ca-path=/etc/ssl/certs
+        --with-ca-bundle=/etc/ssl/cert.pem
+        --disable-threaded-resolverl
+        --disable-websockets
+    )
+../${name}-${version}/configure ${opts[@]} --without-openssl --with-gnutls
+
+
+
+make 
+
+make install DESTDIR=$HOME/rootfs
+
+DESTDIR=$HOME/rootfs
+
+ 	mv $HOME/rootfs/lib/libcurl{,-gnutls}.so.4.8.0
+        mv $HOME/rootfs/lib/libcurl{,-gnutls}.a
+        mv $HOME/rootfs/lib/pkgconfig/libcurl{,-gnutls}.pc
+        sed -i "s/-lcurl/-lcurl-gnutls/g" $HOME/rootfs/lib/pkgconfig/libcurl-gnutls.pc
+        ln -s $HOME/rootfs/lib/libcurl-gnutls.so.4 "${DESTDIR}"/lib/libcurl-gnutls.so
+        for ver in 3 4 4.0.0 4.1.0 4.2.0 4.3.0 4.4.0 4.5.0 4.6.0 4.7.0; do
+            ln -s $HOME/rootfs/lib/libcurl-gnutls.so.4.8.0 "${DESTDIR}"/lib/libcurl-gnutls.so.${ver}
+
+
