@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+version='2.3.1'
+name="acl"
+depends="glibc"
+description=" kütüphanesi"
+source="https://download.savannah.nongnu.org/releases/acl/${name}-${version}.tar.xz"
+groups="sys.apps"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ --libdir=/lib
+	
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

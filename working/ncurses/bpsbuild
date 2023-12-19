@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+version="6.4"
+name="ncurses"
+depends="glibc"
+description="ncurses kütüphanesi"
+source="https://ftp.gnu.org/pub/gnu/ncurses/${name}-${version}.tar.gz"
+groups="sys.libs"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ --with-shared --disable-tic-depends --with-versioned-syms  --enable-widec
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+	cd $DESTDIR/lib
+	ln -s libncursesw.so.6 libtinfow.so.6
+	ln -s libncursesw.so.6 libtinfo.so.6
+	ln -s libncursesw.so.6 libncurses.so.6
+}
+
+

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+version="2.39"
+name="util-linux"
+depends="glibc,readline,ncurses"
+description="temel araçlar"
+source="https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/${name}-${version}.tar.xz"
+groups="sys.apps"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ \
+	--libdir=/lib \
+	--bindir=/bin \
+	--enable-shared \
+	--disable-su \
+	--disable-runuser \
+	--disable-chfn-chsh \
+	--disable-login \
+	--disable-sulogin \
+	--disable-makeinstall-chown \
+	--disable-makeinstall-setuid \
+	--disable-pylibmount \
+	--disable-raw \
+	--without-systemd \
+	--without-libuser \
+	--without-utempter \
+	--without-econf \
+	--enable-libmount \
+	--enable-libblkid 
+
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+	mkdir -p $DESTDIR/lib
+	cp .libs/* -rf $DESTDIR/lib/
+	mkdir -p $DESTDIR/bin
+	cp $DESTDIR/lib/cfdisk $DESTDIR/bin/
+}
+
+

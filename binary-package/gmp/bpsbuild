@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+version="6.3.0"
+name="gmp"
+depends="glibc,readline,ncurses"
+description="şıkıştırma kütüphanesi"
+source="https://gmplib.org/download/gmp/${name}-${version}.tar.gz"
+groups="app.arch"
+setup()
+{
+	../${name}-${version}/configure  --prefix=/ \
+	--libdir=/lib\
+	$(use_opt cxx --enable-cxx --disable-cxx) \
+	--enable-fat
+	
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

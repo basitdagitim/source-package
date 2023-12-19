@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+version="3.7.2"
+name="libarchive"
+depends="glibc"
+description="şıkıştırma kütüphanesi"
+source="https://www.libarchive.org/downloads/${name}-${version}.tar.xz"
+groups="libs"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ 
+	
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

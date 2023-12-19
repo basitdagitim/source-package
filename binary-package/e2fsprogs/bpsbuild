@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+version="1.47.0"
+name="e2fsprogs"
+depends="glibc,readline,ncurses"
+description="modül ve sistem iletişimi sağlayan paket"
+source="https://mirrors.edge.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${version}/${name}-${version}.tar.xz"
+groups="sys.fs"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ \
+            --libdir=/lib/ \
+            --disable-werror 
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+
