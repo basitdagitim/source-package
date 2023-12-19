@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+#set -x
 paket=$1
 dizin=$(pwd)
 
@@ -35,7 +36,7 @@ initsetup()
 	wget ${source}
 	dowloadfile=$(ls|head -1)
 	filetype=$(file -b --extension $dowloadfile|cut -d'/' -f1)
-	echo "***********dosya gz ile sıkıştırılmış**********:${filetype}"
+	echo "***********dosya sıkıştırma türü**********:${filetype}"
 	if [ ${filetype} == "bz2" ]
 	then
 		tar -xvf ${dowloadfile}
@@ -55,7 +56,22 @@ initsetup()
 	echo "***********dosya gz ile sıkıştırılmış**********"
 		tar -xvf ${dowloadfile}
 	fi
+	
+	if [ "${filetype}" == "???" ]
+	then
+	echo "***********dosya zip ile sıkıştırılmış**********"
+		unzip  ${dowloadfile}
+	fi
 	#**********************************************************
+	director=$(find ./* -maxdepth 0 -type d)
+	
+	if [ "${director}" != "./${name}-${version}" ]
+	then
+		mv $director ${name}-${version}
+	fi
+	
+	
+	
 	mkdir -p build-${name}-${version}
 	mkdir -p rootfs-${name}-${version}
 	

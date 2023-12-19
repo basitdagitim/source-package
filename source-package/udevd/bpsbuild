@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+version="3.2.14"
+name="eudev"
+depends="glibc,readline,ncurses"
+description="modül ve sistem iletişimi sağlayan paket"
+source="https://github.com/eudev-project/eudev/releases/download/v3.2.14/${name}-${version}.tar.gz"
+groups="sys.fs"
+setup()
+{
+	../${name}-${version}/configure --prefix=/           \
+            --bindir=/sbin          \
+            --sbindir=/sbin         \
+            --libdir=/lib       \
+            --disable-manpages       \
+            --disable-static \
+            --disable-selinux \
+	    --enable-blkid \
+	    --enable-modules \
+	    --enable-kmod
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

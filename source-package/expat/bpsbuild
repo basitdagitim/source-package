@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+version="2.5.0"
+name="expat"
+depends="glibc"
+description="shell ve network copy"
+source="https://github.com/libexpat/libexpat/releases/download/R_2_5_0/${name}-${version}.tar.gz"
+groups="net.misc"
+setup()
+{
+	../${name}-${version}/configure --prefix=/
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

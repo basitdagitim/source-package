@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+version="5.4.5"
+name="xz"
+depends="glibc,readline,ncurses"
+description="şıkıştırma kütüphanesi"
+source="https://github.com/tukaani-project/xz/releases/download/v5.4.5/${name}-${version}.tar.gz"
+groups="app.arch"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ \
+	  --libdir=/lib \
+	  --enable-shared \
+	$(use_opt doc --enable-doc --disable-doc) \
+	$(use_opt nls --enable-nls --disable-nls)
+	
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

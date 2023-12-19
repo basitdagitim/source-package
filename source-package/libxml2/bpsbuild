@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+version="2.12.1"
+name="libxml2"
+depends="glibc,acl,openssl"
+description="shell ve network copy"
+source="https://github.com/GNOME/libxml2/archive/refs/tags/v${version}.tar.gz"
+groups="net.misc"
+setup()
+{
+	cd $SOURCEDIR
+	autoreconf -fvi
+	cd $BUILDDIR
+	$SOURCEDIR/configure --prefix=/ \
+	  --libdir=/lib \
+	  --enable-shared \
+	
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+
