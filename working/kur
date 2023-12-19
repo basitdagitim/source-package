@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+paket=$1
+#echo "$paket"
+
+basepaket=$(cat depo.index|grep $paket)
+name=${basepaket::-4}
+if [ "${basepaket}" != "" ]
+	then
+	echo "$basepaket"
+	else
+	echo "***********Paket Bulunamadı**********"
+		exit
+	fi
+./indirgentoo ${name}.tar.gz https://github.com/bayramkarahan/distro-binary-package/raw/master/${paket}/${basepaket}
+
+#paket=${dosya::-4}
+
+mkdir -p /tmp/bps
+mkdir -p /tmp/bps/kur
+rm -rf /tmp/bps/kur/*
+#mkdir -p /var/lib/bps
+cp ${name}.tar.gz /tmp/bps/kur/
+cd /tmp/bps/kur/
+tar -xf ${name}.tar.gz
+mkdir -p rootfs
+tar -xf rootfs.tar.xz -C rootfs
+#cd rootfs
+#ls
+#find .
+#cd ..
+#cp ${paket}.index /var/lib/bps/${paket}.index
+
+#https://github.com/bayramkarahan/distro-binary-package/raw/master/glibc/glibc-2.38.bps
