@@ -15,8 +15,8 @@ mkdir -p $boot/bin
 ./kur busybox $boot/
 #*****************kmod hazırlanacak***************************
 ./kur kmod $boot/
-#***************************udevd-udevadm**********************
-./kur udevd $boot/
+#***************************eudev-udevadm**********************
+./kur eudev $boot/
 #***************************util-linux**********************
 ./kur util-linux $boot/
 #*************************base-file kopyalanıyor*************************
