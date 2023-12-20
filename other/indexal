@@ -1,0 +1,7 @@
+#!/bin/sh
+rm -rf depo.index
+rm -rf last.index
+
+find ./* -type f -name *bps>>depo.index
+cat depo.index |cut -d"/" -f3>>last.index
+mv last.index depo.index

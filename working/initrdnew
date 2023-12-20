@@ -1,53 +1,38 @@
 #!/bin/bash
-boot=boot
-rm -rf $HOME/distro/$boot
-#rm -rf $HOME/distro/initrd
+boot=$HOME/distro/deneme
+rm -rf $boot
 
 mkdir -p $HOME/distro
 mkdir -p $HOME/distro/$boot/
-mkdir -p $HOME/distro/$boot/bin
-
+mkdir -p $boot/bin
 #*****************glibc hazırlanmalı************************
-cd $HOME/distro/build-glibc-2.38
-make install DESTDIR=$HOME/distro/$boot
-cd $HOME/distro/$boot/
-ln -s lib lib64
+./kur glibc $boot/
 #***************************readline**********************
-cd $HOME/distro/build-readline-8.1
-make install DESTDIR=$HOME/distro/$boot
-
+./kur readline $boot/
 #***************************ncurses**********************
-cd $HOME/distro/build-ncurses-6.4
-make install DESTDIR=$HOME/distro/$boot
-cd $HOME/distro/$boot/lib
-ln -s libncursesw.so.6 libtinfow.so.6
-ln -s libncursesw.so.6 libtinfo.so.6
-ln -s libncursesw.so.6 libncurses.so.6
-
+./kur ncurses $boot/
 #*************busybox hazırlanmalı************************
-cd $HOME/distro/busybox-1.36.1
-cp ./busybox $HOME/distro/$boot/bin/busybox #sistemden kopyalandı..
-
+./kur busybox $boot/
 #*****************kmod hazırlanacak***************************
-cd $HOME/distro/build-kmod-31
-make install DESTDIR=$HOME/distro/$boot
-
-cd $HOME/distro/$boot/sbin
-ln -s kmod depmod
-ln -s kmod insmod
-ln -s kmod lsmod
-ln -s kmod modinfo
-ln -s kmod modprobe
-ln -s kmod rmmod
-
+./kur kmod $boot/
+#***************************eudev-udevadm**********************
+./kur eudev $boot/
+#***************************util-linux**********************
+./kur util-linux $boot/
+#*************************base-file kopyalanıyor*************************
+./kur base-file $boot/
+#*************************grub kopyalanıyor*************************
+./kur grub $boot/
+#*************************e2fsprogs kopyalanıyor*************************
+./kur e2fsprogs $boot/
 #****************modul yukleme*************************
 #cd $HOME/distro/linux-6.6.2
 #make bzImage modules
 #INSTALL_MOD_PATH="$HOME/distro/initrd" make modules_install
 #/sbin/depmod --all --basedir=initrd #modul indeksi oluşturluyor
-mkdir -p $HOME/distro/$boot/lib/modules/
-mkdir -p $HOME/distro/$boot/lib/modules/$(uname -r)
-mkdir -p $HOME/distro/$boot/lib/modules/$(uname -r)/moduller
+mkdir -p $boot/lib/modules/
+mkdir -p $boot/lib/modules/$(uname -r)
+mkdir -p $boot/lib/modules/$(uname -r)/moduller
 #moduller {cdrom,loop,md,ahci,block,ata,firewire,sd,scsi,message,pcmcia,virtio,host}
 #moduller {storage,crypto,fs,lib,dm-snapshot,overlay,isofs,squashfs,hfsplus,sr_mod,dm_mod}
 #moduller {nls,nls_utf8,overlayfs,udf,ext4,usb-storage}
@@ -61,52 +46,21 @@ mkdir -p $HOME/distro/$boot/lib/modules/$(uname -r)/moduller
 #  find /lib/modules/$(uname -r)/kernel/${directory}/ -type f \
 #      -exec install {} $HOME/distro/initrd/lib/modules/$(uname -r)/moduller/ \;
 #	done
-cp $HOME/boot/initrd/lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/$boot/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
+cp $HOME/boot/initrd/lib/modules/$(uname -r)/kernel/* -rf $boot/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
 #cp /lib/modules/$(uname -r)/kernel/* -rf $HOME/distro/$boot/lib/modules/$(uname -r)/moduller/ #sistemden kopyalandı..
 /sbin/depmod --all --basedir=$HOME/distro/boot #modul indeksi oluşturluyor
 #*****************kurallar yüklenecek*************************
-mkdir -p $HOME/distro/$boot/etc/udev/
-mkdir -p $HOME/distro/$boot/lib/udev/
-cp $HOME/boot/initrd/etc/udev/rules.d -rf  $HOME/distro/$boot/etc/udev/
-cp $HOME/boot/initrd/lib/udev/rules.d -rf  $HOME/distro/$boot/lib/udev/
+mkdir -p $boot/etc/udev/
+mkdir -p $boot/lib/udev/
+cp $HOME/boot/initrd/etc/udev/rules.d -rf  $boot/etc/udev/
+cp $HOME/boot/initrd/lib/udev/rules.d -rf  $boot/lib/udev/
 #rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-drivers.rules
 #rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-debian-compat.rules
 #rm -rf $HOME/distro/initrd/lib/udev/rules.d/80-net-setup-link.rules
 #rm -rf $HOME/distro/initrd/lib/udev/rules.d/90-nm-thunderbolt.rules
 #rm -rf $HOME/distro/initrd/lib/udev/rules.d/73-seat-late.rules
-#***************************udevd-udevadm**********************
-cd $HOME/distro/build-eudev-3.2.14
-make install DESTDIR=$HOME/distro/$boot
 
-#***************************util-linux**********************
-cd $HOME/distro/build-util-linux-2.39
-make install DESTDIR=$HOME/distro/$boot
-cp .libs/* -rf $HOME/distro/$boot/lib/
-cp $HOME/distro/$boot/lib/cfdisk $HOME/distro/$boot/bin/
-#*************************base-file kopyalanıyor*************************
-cp $HOME/distro/base-files-0/* -rf $HOME/distro/$boot
-
-#*************************grub kopyalanıyor*************************
-cd $HOME/distro/build-grub-2.06
-make install DESTDIR=$HOME/distro/$boot
-
-#*************************rsync kopyalanıyor*************************
-cd $HOME/distro/build-rsync-3.2.7
-make install DESTDIR=$HOME/distro/$boot
-
-#*************************e2fsprogs kopyalanıyor*************************
-cd $HOME/distro/build-e2fsprogs-1.47.0
-make install DESTDIR=$HOME/distro/$boot
-
-#*************************dialog kopyalanıyor*************************
-cd $HOME/distro/build-dialog-1.3-20230209
-make install DESTDIR=$HOME/distro/$boot
-
-#*************************live-boot*************************
-#cd $HOME/distro/live-boot
-#make install DESTDIR=$HOME/distro/initrd
-
-cd $HOME/distro/$boot
+cd $boot
 find |cpio -H newc -o >../boot-initrd.img
 
 

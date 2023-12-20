@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+version="31"
+name="kmod"
+depends="glibc,zlib"
+description="kmod uygulaması"
+source="https://mirrors.edge.kernel.org/pub/linux/utils/kernel/kmod/${name}-${version}.tar.xz"
+groups="sys.apps"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ \
+        --libdir=/lib/ \
+        --bindir=/sbin
+        
+	   # remove xsltproc dependency
+	   rm -f man/Makefile
+	   echo -e "all:\ninstall:" > man/Makefile
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+	cd $DESTDIR
+	for target in depmod insmod modinfo modprobe rmmod; do
+  	ln -sfv kmod sbin/$target
+	done
+	mkdir -p bin
+	ln -sfv kmod bin/lsmod
+}
+
+
