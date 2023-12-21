@@ -24,13 +24,14 @@ cd build-${name}-${version}
    
 make 
 
-make install DESTDIR=$HOME/rootfs
-cd $HOME/rootfs
+make install DESTDIR=$HOME/distro/deneme
+cd $HOME/distro/deneme/sbin
 
 for target in depmod insmod modinfo modprobe rmmod; do
-  ln -sfv sbin/kmod sbin/$target
+  ln -sfv kmod $target
 done
 
-ln -sfv sbin/kmod bin/lsmod
+cd $HOME/distro/deneme/bin
+ln -sfv ../sbin/kmod lsmod
 
 

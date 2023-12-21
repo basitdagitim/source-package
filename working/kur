@@ -4,7 +4,7 @@ paket=$1
 paketname="name=\"${paket}\""
 ROOTFS=$2
 #echo "$paket"
-wget -O /tmp/index.lst https://bayramkarahan.github.io/distro-binary-package/index.lst
+#wget -O /tmp/index.lst https://bayramkarahan.github.io/distro-binary-package/index.lst
 indexpaket=$(cat /tmp/index.lst|grep $paketname)
 name=""
 version=""
