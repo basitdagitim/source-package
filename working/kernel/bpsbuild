@@ -1,27 +1,22 @@
 #!/usr/bin/env bash
-version="3.2.7"
-name="rsync"
-depends="glibc,acl,openssl"
-description="shell ve network copy"
-source="https://download.samba.org/pub/rsync/src/${name}-${version}.tar.gz"
-groups="net.misc"
+version="6.1"
+name="kernel"
+depends=""
+description="temel dağıtım kernel dosyası"
+source=""
+groups="sys.base"
 setup()
 {
-	../${name}-${version}/configure --prefix=/ \
-        --libdir=/lib/ \
-        --with-included-popt \
-        --with-included-zlib \
-        --disable-xxhash \
-    	--disable-lz4
-	
+	echo ""
 }
 build()
 {
-	make 
+	echo ""
 }
 package()
 {
-	make install DESTDIR=$DESTDIR
+	mkdir -p ${DESTDIR}/boot
+	cp -prfv $dizin/$name/vmlinuz  ${DESTDIR}/boot/
 }
 
 

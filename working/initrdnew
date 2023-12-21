@@ -6,16 +6,16 @@ mkdir -p $HOME/distro
 mkdir -p $boot
 mkdir -p $boot/bin
 ./bpsupdate
-./kur glibc $boot/
-./kur readline $boot/
-./kur ncurses $boot/
-./kur busybox $boot/
-./kur kmod $boot/
-./kur eudev $boot/
-./kur util-linux $boot/
-./kur base-file $boot/
-./kur grub $boot/
-./kur e2fsprogs $boot/
+./bpskur glibc $boot/
+./bpskur readline $boot/
+./bpskur ncurses $boot/
+./bpskur busybox $boot/
+./bpskur kmod $boot/
+./bpskur eudev $boot/
+./bpskur util-linux $boot/
+./bpskur base-file $boot/
+./bpskur grub $boot/
+./bpskur e2fsprogs $boot/
 #****************modul yukleme*************************
 #cd $HOME/distro/linux-6.6.2
 #make bzImage modules
@@ -75,7 +75,7 @@ mkdir -p $HOME/distro/iso/live || true
 
 #iso dizinine vmlinuz ve initrd.img dosyamız kopyalanıyor
 #cp $HOME/distro/linux-6.6.2/arch/x86/boot/bzImage $HOME/distro/iso/boot/vmlinuz 
-cp $HOME/boot/vmlinuz-$(uname -r) $HOME/distro/iso/boot/vmlinuz  #sistemde kullandığım kerneli kopyaladım istenirde kernel derlenebilir.
+cp /boot/vmlinuz-$(uname -r) $HOME/distro/iso/boot/vmlinuz  #sistemde kullandığım kerneli kopyaladım istenirde kernel derlenebilir.
 zstd  $HOME/distro/boot-initrd.img -10
 mv $HOME/distro/boot-initrd.img.zst $HOME/distro/boot-initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
 mv $HOME/distro/boot-initrd.img $HOME/distro/iso/boot/initrd.img #oluşturduğumuz **initrd.img** dosyamızı taşıyoruz.
@@ -85,6 +85,10 @@ echo '    linux /boot/vmlinuz net.ifnames=0 biosdevname=0 ' >> $HOME/distro/iso/
 echo '    initrd /boot/initrd.img' >> $HOME/distro/iso/boot/grub/grub.cfg
 echo '}' >> $HOME/distro/iso/boot/grub/grub.cfg
 
+echo 'menuentry "Disk GNU/Linux 64-bit" --class liveiso  {' > $HOME/distro/iso/boot/grub/grub.cfg
+echo '    linux /boot/vmlinuz net.ifnames=0 biosdevname=0 init=/bin/initdisk ' >> $HOME/distro/iso/boot/grub/grub.cfg
+echo '    initrd /boot/initrd.img' >> $HOME/distro/iso/boot/grub/grub.cfg
+echo '}' >> $HOME/distro/iso/boot/grub/grub.cfg
 
 echo 'menuentry "Live GNU/Linux 64-bit" --class liveiso  {' >> $HOME/distro/iso/boot/grub/grub.cfg
 echo '    linux /boot/vmlinuz init=/bin/canli ' >> $HOME/distro/iso/boot/grub/grub.cfg
@@ -106,7 +110,7 @@ echo '    linux /boot/vmlinuz init=/bin/kuruefi ' >> $HOME/distro/iso/boot/grub/
 echo '    initrd /boot/initrd.img' >> $HOME/distro/iso/boot/grub/grub.cfg
 echo '}' >> $HOME/distro/iso/boot/grub/grub.cfg
 
-grub-mkrescue $HOME/distro/iso/ -o $HOME/distro/distro.iso
+#grub-mkrescue $HOME/distro/iso/ -o $HOME/distro/distro.iso
 #qemu-system-x86_64 -cdrom $HOME/distro/distro.iso -m 1G
 
 

@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+set -e
+#set -x
+paket=$1
+dizin=$(pwd)
+
+if [ ! -d ${paket} ]; then
+echo "Bir paket değil!"
+exit
+fi
+if [ ! -f "${paket}/bpsbuild" ]; then
+echo "Paket dosyası bulunamadı!"
+exit
+fi
+
+echo "Paket : $paket"
+
+source ${paket}/bpsbuild
+DESTDIR=/tmp/bps/build/rootfs-${name}-${version}
+SOURCEDIR=/tmp/bps/build/${name}-${version}
+BUILDDIR=/tmp/bps/build/build-${name}-${version}
+#echo $name
+#echo $version
+
+initsetup()
+{
+
+	mkdir -p /tmp/bps
+	mkdir -p /tmp/bps/build
+	cd /tmp/bps/build
+	rm -rf ./*
+	rm -rf build-${name}-${version}*
+	rm -rf ${name}-${version}*
+	rm -rf rootfs-${name}-${version}*
+	
+	if [ -n "${source}" ]
+	then
+		wget ${source}
+	
+		dowloadfile=$(ls|head -1)
+		filetype=$(file -b --extension $dowloadfile|cut -d'/' -f1)
+		echo "***********dosya sıkıştırma türü**********:${filetype}"
+		if [ ${filetype} == "bz2" ]
+		then
+			tar -xvf ${dowloadfile}
+		fi
+		
+		if [ ${filetype} == "tar" ]
+		then
+			tar -xvf ${dowloadfile}
+		fi
+
+		if [ ${filetype} == "xz" ]
+		then
+			tar -xvf ${dowloadfile}
+		fi
+		if [ "${filetype}" == "gz" ]
+		then
+		echo "***********dosya gz ile sıkıştırılmış**********"
+			tar -xvf ${dowloadfile}
+		fi
+		
+		if [ "${filetype}" == "???" ]
+		then
+		echo "***********dosya zip ile sıkıştırılmış**********"
+			unzip  ${dowloadfile}
+		fi
+		#**********************************************************
+		director=$(find ./* -maxdepth 0 -type d)
+		
+		if [ "${director}" != "./${name}-${version}" ]
+		then
+			mv $director ${name}-${version}
+		fi
+		
+	fi
+	
+	mkdir -p build-${name}-${version}
+	mkdir -p rootfs-${name}-${version}
+	
+	cp ${dizin}/${paket}/bpsbuild /tmp/bps/build
+	cd build-${name}-${version}
+}
+
+#********************************paket index******************************************************
+paketindex()
+{
+	#find rootfs-${name}-${version}/*>file.index	
+	rm -rf file.index
+	cd /tmp/bps/build/rootfs-${name}-${version}
+	find . |
+	    while IFS= read file_name; do
+	    
+	    	if [ -f ${file_name} ]; then
+	    		echo ${file_name:1}>>../file.index
+		fi
+	    done
+	find . -type l|
+	    while IFS= read file_name; do
+	    
+	    	if [ -L ${file_name} ]; then
+	    		echo ${file_name:1}>>../file.index
+		fi
+	    done
+}
+#*******************************xz compress****************************************
+
+
+paketle()
+{
+cd /tmp/bps/build/rootfs-${name}-${version}
+tar -cf ../rootfs.tar ./*
+cd /tmp/bps/build/
+xz -9 rootfs.tar
+tar -cvzf paket-${name}-${version}.tar.gz rootfs.tar.xz file.index bpsbuild
+cp paket-${name}-${version}.tar.gz ${dizin}/${paket}/${name}-${version}.bps
+#rm -rf build-${name}-${version}*
+#rm -rf ${name}-${version}*
+}
+
+echo "******************** initsetup *******************"
+initsetup
+echo "******************** setup **********************"
+setup
+echo "******************** build **********************"
+build
+echo "******************** package ********************"
+package
+echo "******************** paketindex *****************"
+paketindex
+echo "******************** paketle ********************"
+paketle

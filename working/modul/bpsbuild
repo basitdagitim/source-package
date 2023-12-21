@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+version="6.1"
+name="modul"
+depends=""
+description="temel dağıtım modul dosyaları"
+source=""
+groups="sys.base"
+setup()
+{
+	echo ""
+}
+build()
+{
+	echo ""
+}
+package()
+{
+	mkdir -p ${DESTDIR}/lib
+	mkdir -p ${DESTDIR}/lib/modules
+	mkdir -p ${DESTDIR}/lib/modules/6.1.0-13-amd64
+	mkdir -p ${DESTDIR}/lib/modules/6.1.0-13-amd64/moduller
+	
+
+	cp -prfv $dizin/$name/modul.tar.xz  ${DESTDIR}/lib/modules/6.1.0-13-amd64/moduller/
+	cd  ${DESTDIR}/lib/modules/6.1.0-13-amd64/moduller/
+	tar -xf modul.tar.xz
+	rm -rf modul.tar.xz
+}
+
+

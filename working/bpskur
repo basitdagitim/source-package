@@ -1,0 +1,49 @@
+#!/bin/sh
+#set -e
+paket=$1
+paketname="name=\"${paket}\""
+ROOTFS=$2
+#echo "$paket"
+#wget -O /tmp/index.lst https://bayramkarahan.github.io/distro-binary-package/index.lst
+indexpaket=$(cat /tmp/index.lst|grep $paketname)
+name=""
+version=""
+depends=""
+if [ -n "${indexpaket}" ]
+	then
+		#echo "$indexpaket"
+		namex=$(echo $indexpaket|cut -d":" -f1)
+		versionx=$(echo $indexpaket|cut -d":" -f2)
+		dependsx=$(echo $indexpaket|cut -d":" -f3)
+		name=${namex:6:-1}
+		version=${versionx:9:-1}
+		depends=${dependsx:9:-1}
+		#echo "$name/$version/$depends"
+	else
+	echo "***********Paket Bulunamadı**********"
+	exit
+fi
+
+#exit
+./indirgentoo ${name}.tar.gz https://github.com/bayramkarahan/distro-binary-package/raw/master/${name}/${name}-${version}.bps
+
+#paket=${dosya::-4}
+
+mkdir -p /tmp/bps
+mkdir -p /tmp/bps/kur
+rm -rf /tmp/bps/kur/*
+#mkdir -p /var/lib/bps
+cp ${name}.tar.gz /tmp/bps/kur/
+rm -rf  ${name}.tar.gz
+cd /tmp/bps/kur/
+tar -xf ${name}.tar.gz
+mkdir -p rootfs
+tar -xf rootfs.tar.xz -C rootfs
+cp -prfv rootfs/* $ROOTFS/
+#cd rootfs
+#ls
+#find .
+#cd ..
+#cp ${paket}.index /var/lib/bps/${paket}.index
+
+#https://github.com/bayramkarahan/distro-binary-package/raw/master/glibc/glibc-2.38.bps
