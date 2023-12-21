@@ -5,6 +5,8 @@ modprobe ext4
 
 mkfs.ext4 /dev/sda2
 mkfs.vfat /dev/sda1
+cd /
+
 mkdir -p hedef
 mkdir -p kaynak
 mkdir -p cdrom
