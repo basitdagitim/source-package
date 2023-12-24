@@ -1,3 +1,0 @@
-#!/bin/sh
-wget -O /tmp/index.lst https://bayramkarahan.github.io/distro-binary-package/index.lst
-#https://github.com/bayramkarahan/distro-binary-package/raw/master/glibc/glibc-2.38.bps
