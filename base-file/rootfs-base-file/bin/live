@@ -38,11 +38,11 @@ mount_top()
 	modprobe "hfsplus"
 	modprobe "sr_mod"
 	modprobe "dm_mod"
-	modprobe "dm-raid"
-	modprobe "raid0"
-	modprobe "raid1"
-	modprobe "raid10"
-	modprobe "raid456"
+	#modprobe "dm-raid"
+	#modprobe "raid0"
+	#modprobe "raid1"
+	#modprobe "raid10"
+	#modprobe "raid456"
 	modprobe 'nls'
 	modprobe 'nls_utf8'
 	modprobe 'overlayfs'

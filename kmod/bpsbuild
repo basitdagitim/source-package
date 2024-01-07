@@ -22,12 +22,14 @@ build()
 package()
 {
 	make install DESTDIR=$DESTDIR
-	cd $DESTDIR
+	cd $DESTDIR/sbin
 	for target in depmod insmod modinfo modprobe rmmod; do
-  	ln -sfv sbin/kmod sbin/$target
+  	ln -sfv kmod $target
 	done
-	mkdir -p bin
-	ln -sfv sbin/kmod bin/lsmod
+	
+	mkdir -p $DESTDIR/bin
+	cd $DESTDIR/bin
+	ln -sfv ../sbin/kmod lsmod
 }
 
 

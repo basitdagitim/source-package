@@ -1,0 +1,3 @@
+#!/bin/sh
+indirgentoo /tmp/index.lst https://basitdagitim.github.io/binary-package/index.lst
+

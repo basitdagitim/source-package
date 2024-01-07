@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+version="6.6.0"
+name="linux-image"
+depends=""
+description="temel dağıtım kernel dosyası ve moduller"
+source=""
+groups="sys.base"
+setup()
+{
+	echo ""
+}
+build()
+{
+	echo ""
+}
+package()
+{
+	cp -prfv $dizin/$name/boot  ${DESTDIR}/
+	cp -prfv $dizin/$name/etc  ${DESTDIR}/
+	cp -prfv $dizin/$name/lib  ${DESTDIR}/
+	
+}
+
+

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+version="10.42"
+name="pcre2"
+depends=""
+description="Perl-compatible regular expression library"
+source="https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/${name}-${version}.tar.gz"
+
+
+groups="app.arch"
+setup()
+{
+
+     ../${name}-${version}/configure --prefix=/ \
+    	--libdir=/lib \
+	    --enable-shared \
+	    --enable-static \
+        --enable-pcre2-16 \
+        --enable-pcre2-32 \
+        --enable-jit \
+        --enable-pcre2test-libreadline 
+}
+build()
+{
+	
+	make 
+}
+package()
+{
+	
+	make install DESTDIR=$DESTDIR
+}
+
+

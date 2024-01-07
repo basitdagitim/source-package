@@ -13,7 +13,7 @@ cap_opts=(
     SUDO=""
     prefix=/
     KERNEL_HEADERS=/usr/include
-    lib=lib64
+    lib=lib
     RAISE_SETFCAP=no
     #$(use_opt pam PAM_CAP=yes PAM_CAP=no)
     )
@@ -27,7 +27,9 @@ build()
 }
 package()
 {
+	
 	make install DESTDIR=$DESTDIR
+	mv $DESTDIR/lib64 $DESTDIR/lib
 }
 
 

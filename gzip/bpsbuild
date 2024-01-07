@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+version="1.13"
+name="gzip"
+depends=""
+description="Standard GNU compressor"
+source="https://ftp.gnu.org/gnu/gzip/${name}-${version}.zip"
+groups="app.arch"
+setup()
+{
+	../${name}-${version}/configure --prefix=/ \
+        --libdir=/lib/
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

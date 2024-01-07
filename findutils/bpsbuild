@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-version="1.47.0"
-name="e2fsprogs"
+name="findutils"
+release="1"
+version="4.9.0"
 depends="glibc,readline,ncurses"
 description="modül ve sistem iletişimi sağlayan paket"
-source="https://mirrors.edge.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${version}/${name}-${version}.tar.xz"
+source="https://ftp.gnu.org/gnu/findutils/findutils-$version.tar.xz"
 groups="sys.fs"
 setup()
 {
 	../${name}-${version}/configure --prefix=/ \
-            --libdir=/lib/ 
+        --libdir=/lib/
 }
 build()
 {
@@ -17,7 +18,6 @@ build()
 package()
 {
 	make install DESTDIR=$DESTDIR
-	rm -rf $DESTDIR/usr/share/man/man8/fsck.8
 }
 
 
