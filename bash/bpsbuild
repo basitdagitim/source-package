@@ -21,6 +21,8 @@ build()
 package()
 {
 	make install DESTDIR=$DESTDIR
+	cd $DESTDIR/bin
+	ln -s bash sh
 }
 
 
