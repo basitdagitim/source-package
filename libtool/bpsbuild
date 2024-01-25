@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+name="libtool"
+version="2.4.6"
+description="GNU Libtool - The GNU Portable Library Tool"
+source=("https://ftpmirror.gnu.org/libtool/libtool-$version.tar.gz")
+depends=("sed,grep")
+group=(sys.devel)
+
+
+setup(){
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/usr/lib64
+}
+
+build(){
+    make
+}
+
+package(){
+    make install DESTDIR=$DESTDIR
+}
+

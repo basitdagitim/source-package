@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+name="binutils"
+version="2.41"
+description="A set of programs to assemble and manipulate binary and object files"
+source=("https://ftp.gnu.org/gnu/binutils/binutils-$version.tar.xz")
+depends=(zlib)
+group=(sys.devel)
+
+unset CFLAGS
+unset CXXFLAGS
+
+export PATH=$PATH:$HOME
+
+
+setup(){
+	cd $SOURCEDIR
+  	echo "#!/bin/sh" > $HOME/makeinfo
+    	echo "printf 'makeinfo (GNU texinfo) 5.2\n'" >> $HOME/makeinfo
+    	chmod +x $HOME/makeinfo
+
+    mkdir build
+    cd build
+    set -x
+    ../configure --prefix=/usr \
+          --libdir=/usr/lib64 \
+          --sysconfdir=/etc \
+          --enable-cet \
+          --enable-default-execstack=no \
+          --disable-compressed-debug-sections \
+          --disable-silent-rules \
+          --enable-obsolete \
+          --enable-gold \
+          --enable-install-libiberty \
+          --enable-ld \
+          --enable-new-dtags \
+          --enable-pgo-build=lto \
+          --enable-plugins \
+          --enable-relro \
+          --enable-shared \
+          $(use_opt x86_64 --enable-targets=x86_64-linux-gnu,x86_64-linux-gnux32,x86_64-pep ) \
+          $(use_opt x86_64 --disable-x86-used-note )\
+          --with-gold-ldflags=-static-libstdc++ \
+          --enable-threads \
+          --disable-gdb \
+          --disable-gdbserver \
+          --disable-libdecnumber \
+          --disable-readline \
+          --disable-sim \
+          --disable-werror \
+          --with-pic \
+          --with-system-zlib
+}
+
+build(){
+    cd build
+    make configure-host
+    make tooldir=/usr
+}
+
+package(){
+    cd build
+    make tooldir=/usr install DESTDIR=$DESTDIR
+     cd $DESTDIR
+    	#find ./ -iname "*" -exec strip -s {} \;
+    	
+    	  while read -rd '' file; do
+        case "$(file -Sib "$file")" in
+            application/x-sharedlib\;*)      # Libraries (.so)
+                strip "$file" ;;
+            application/x-executable\;*)     # Binaries
+                strip "$file" ;;
+            application/x-pie-executable\;*) # Relocatable binaries
+                strip "$file" ;;
+        esac
+       
+    done< <(find "./" -type f -iname "*" -print0)
+}
+

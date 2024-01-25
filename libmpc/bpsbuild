@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+version="1.3.1"
+name="libmpc"
+depends="glibc,mpfr"
+description="Library for the arithmetic of complex numbers with arbitrarily high precision"
+source="https://ftp.gnu.org/gnu/mpc/mpc-$version.tar.gz"
+groups="dev.libs"
+
+setup()
+{
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/usr/lib64
+}
+build()
+{
+	make
+}
+package()
+{
+	make install DESTDIR=${DESTDIR}
+}
+
+

@@ -1,0 +1,49 @@
+#!/bin/sh
+#!/bin/sh
+#set -e
+paket=$1
+paketname="name=\"${paket}\""
+ROOTFS=$2
+#echo "$paket"
+indexpaket=$(busybox cat /tmp/index.lst|busybox grep $paketname)
+name=""
+version=""
+depends=""
+if [ -n "${indexpaket}" ]
+then
+	namex=$(echo $indexpaket|busybox cut -d":" -f1)
+	versionx=$(echo $indexpaket|busybox cut -d":" -f2)
+	dependsx=$(echo $indexpaket|busybox cut -d":" -f3)
+	name=${namex:6:-1}
+	version=${versionx:9:-1}
+	depends=${dependsx:9:-1}
+else
+	
+	echo "***********Paket Bulunamadı**********"
+	exit
+fi
+echo "********** $name Paketi Kuruluyor **********"
+# paketi indirme
+busybox mkdir -p /tmp/bps
+busybox mkdir -p /tmp/bps/kur
+busybox rm -rf /tmp/bps/kur/*
+busybox wget -O /tmp/bps/kur/${name}-${version}.tar.gz https://github.com/basitdagitim/binary-package/raw/master/${name}/${name}-${version}.bps 1>/dev/null 2>/dev/null
+busybox mkdir -p /var/lib/bps
+busybox touch /var/lib/bps/index.lst
+#busybox cd /tmp/bps/kur/
+
+# paketi açma
+busybox tar -xf /tmp/bps/kur/${name}-${version}.tar.gz -C /tmp/bps/kur/
+#busybox mkdir -p rootfs
+busybox tar -xf /tmp/bps/kur/rootfs.tar.xz -C /
+
+# paketi kurma
+#busybox cp -prfv rootfs/* $ROOTFS/ 1>/dev/null 2>/dev/null
+
+#eğer daha kurulmuşsa kayıt siliniyor
+busybox sed -i '/name=\"${paket}\"/d' /var/lib/bps/index.lst
+#name version depends /var/bps/index.lst eklenmesi
+echo "name=\"${name}\":"version=\"${version}\":"depends=\"${depends}\"">>/var/lib/bps/index.lst
+#paket içinde gelen paket dosyalarının dosya ve dizin yapısını tutan file index dosyanının /var/bps/ konumuna kopyalanması
+busybox cp /tmp/bps/kur/file.index /var/lib/bps/${name}-${version}.lst
+echo "********** $name Paketi Kuruldu **********"

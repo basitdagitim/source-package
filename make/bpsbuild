@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+name="make"
+version="4.4"
+description="GNU make utility to maintain groups of programs"
+source=("https://ftp.gnu.org/gnu/make/make-${version}.tar.gz")
+depends=( )
+group=(sys.devel)
+
+
+setup(){
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/usr/lib64
+}
+
+build(){
+    make
+}
+
+package(){
+    make install DESTDIR=$DESTDIR
+}
+

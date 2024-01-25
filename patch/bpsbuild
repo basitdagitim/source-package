@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+name="patch"
+version="2.7.6"
+description="A utility to apply patch files to original sources"
+source=("https://ftp.gnu.org/gnu/patch/patch-$version.tar.xz")
+depends=("attr")
+group=(sys.devel)
+
+
+setup(){
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/usr/lib64/
+}
+
+build(){
+    make
+}
+
+package(){
+    make install DESTDIR=$DESTDIR
+}
+

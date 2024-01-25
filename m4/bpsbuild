@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+name="m4"
+version="1.4.19"
+description="GNU macro processor"
+source=("https://ftp.gnu.org/gnu/m4/m4-${version}.tar.xz")
+depends=( )
+nls_depends=("gettext")
+group=(sys.devel)
+
+
+setup(){
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/usr/lib64 \
+		--enable-changeword \
+		$(use_opt nls --enable-nls --disable-nls)
+}
+
+build(){
+    make
+}
+
+package(){
+    make install DESTDIR=$DESTDIR
+}
+

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+name="libunistring"
+version="1.1"
+description="Library for manipulating Unicode strings and C strings"
+source=("https://ftp.gnu.org/gnu/libunistring/libunistring-$version.tar.xz")
+depends=( )
+group=(dev.libs)
+
+
+setup(){
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/usr/lib64
+}
+
+build(){
+    make
+}
+
+package(){
+    make install DESTDIR=$DESTDIR
+    cd $BUILDDIR
+    ln -s libunistring.so ${DESTDIR}/usr/lib64/libunistring.so.2
+    ln -s libunistring.so ${DESTDIR}/usr/lib64/libunistring.so.2.2.0
+}
+

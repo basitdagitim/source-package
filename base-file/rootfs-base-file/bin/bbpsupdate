@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "********** Paket Listesi Güncelleniyor **********"
+busybox wget -O /tmp/index.lst https://basitdagitim.github.io/binary-package/index.lst 1>/dev/null 2>dev/null
+echo "********** Paket Listesi Güncellendi **********"
+

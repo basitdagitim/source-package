@@ -23,7 +23,7 @@ initsetup()
 	
 	if [ -n "${source}" ]
 	then
-		wget ${source}
+		curl -Lk -o ${source}
 		dowloadfile=$(ls|head -1)
 		filetype=$(file -b --extension $dowloadfile|cut -d'/' -f1)
 		

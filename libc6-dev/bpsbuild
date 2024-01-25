@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+version="2.38-5"
+name="libc6-dev"
+depends=""
+description="temel dağıtım kernel dosyası ve moduller"
+source=""
+groups="sys.base"
+setup()
+{
+	echo ""
+	# deb dosyası indirilir http://ftp.tr.debian.org/debian/pool/main/g/glibc/libc6-dev_2.38-5_amd64.deb
+	#cd $SOURCEDIR
+	wget -O libc.deb http://ftp.tr.debian.org/debian/pool/main/g/glibc/libc6-dev_2.38-5_amd64.deb
+	# ar x indirilen dosya
+	ar x libc.deb
+	# tar -xf data.tar.xz
+	tar -xf data.tar.xz
+	# find ./ -iname "*" -exec unxz {} \; komutuyla xz açılır
+	
+
+	
+}
+build()
+{
+	echo ""
+}
+package()
+{
+	cd $BUILDDIR
+	
+	cp -prfv usr  ${DESTDIR}/
+	find ${DESTDIR}/ -iname "*" -exec unxz {} \;
+	
+}
+
+

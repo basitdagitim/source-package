@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-version="6.6.0"
+version="6.6.13"
 name="linux-image"
 depends=""
 description="temel dağıtım kernel dosyası ve moduller"
@@ -8,6 +8,17 @@ groups="sys.base"
 setup()
 {
 	echo ""
+	# deb dosyası indirilir http://ftp.tr.debian.org/debian/pool/main/l/linux-signed-amd64/
+	cd $SOURCEDIR
+	wget -O image.deb http://ftp.tr.debian.org/debian/pool/main/l/linux-signed-amd64/linux-image-6.6.13-amd64_6.6.13-1_amd64.deb
+	# ar x indirilen dosya
+	ar x image.deb
+	# tar -xf data.tar.xz
+	tar -xf data.tar.xz
+	# find ./ -iname "*" -exec unxz {} \; komutuyla xz açılır
+	
+
+	
 }
 build()
 {
@@ -15,9 +26,11 @@ build()
 }
 package()
 {
-	cp -prfv $dizin/$name/boot  ${DESTDIR}/
-	cp -prfv $dizin/$name/etc  ${DESTDIR}/
-	cp -prfv $dizin/$name/lib  ${DESTDIR}/
+	cd $BUILDDIR
+	cp -prfv boot  ${DESTDIR}/
+	#cp -prfv $dizin/$name/etc  ${DESTDIR}/
+	cp -prfv lib  ${DESTDIR}/
+	find ${DESTDIR}/ -iname "*" -exec unxz {} \;
 	
 }
 

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+name="bc"
+version="1.07"
+description="Handy console-based calculator utility"
+source="https://salsa.debian.org/debian/bc/-/archive/debian/$version.1-3/bc-debian-$version.1-3.tar.gz"
+#"https://gitweb.gentoo.org/repo/gentoo.git/plain/sys-devel/bc/files/bc-1.07.1-no-ed-its-sed.patch"
+depends="readline"
+group="sys.devel"
+#export CFLAGS="-static"
+export PATH=$PATH:$HOME
+
+
+setup(){
+	cp -prfv $dizin/$name/bc-1.07.1-no-ed-its-sed.patch  /tmp/bps/build/
+ echo "#!/bin/sh" > $HOME/makeinfo
+    echo "printf 'makeinfo (GNU texinfo) 5.2\n'" >> $HOME/makeinfo
+    chmod +x $HOME/makeinfo
+    cd $SOURCEDIR
+    patch -Np1 -i ../bc-1.07.1-no-ed-its-sed.patch
+    for file in debian/patches/*.diff ; do
+        patch -Np1 -i $file
+    done
+    
+
+    autoreconf -fvi
+        cd $BUILDDIR
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/usr/lib64/ \
+        --with-readline
+}
+
+build(){
+    make
+}
+
+package(){
+    make install DESTDIR=$DESTDIR
+}
+

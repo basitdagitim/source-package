@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+version="6.6.0"
+name="linux-headers"
+depends=""
+description="temel dağıtım kernel dosyası ve headers"
+source=""
+groups="sys.base"
+setup()
+{
+	echo ""
+}
+build()
+{
+	echo ""
+}
+package()
+{
+	cp -prfv $dizin/$name/usr  ${DESTDIR}/
+	cp -prfv $dizin/$name/lib  ${DESTDIR}/
+	
+}
+
+

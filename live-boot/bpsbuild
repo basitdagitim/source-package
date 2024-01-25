@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+version="1230131"
+name="live-boot"
+depends="glibc,acl,openssl"
+description="shell ve network copy"
+source="https://salsa.debian.org/live-team/live-boot/-/archive/debian/1%2520230131/live-boot-debian-1%2520230131.tar.gz"
+groups="net.misc"
+setup()
+{
+	echo "test"
+	cd $SOURCEDIR
+}
+build()
+{
+	make 
+}
+package()
+{
+	make install DESTDIR=$DESTDIR
+}
+
+

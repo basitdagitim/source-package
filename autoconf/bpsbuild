@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+name="autoconf"
+version="2.72"
+description="A GNU tool for automatically configuring source code"
+source=("https://ftp.gnu.org/gnu/autoconf/autoconf-${version}.tar.xz")
+depends="perl,m4"
+group=(sys.devel)
+
+
+setup(){
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/usr/lib64
+}
+
+build(){
+    make
+}
+
+package(){
+    make install DESTDIR=$DESTDIR
+}
+

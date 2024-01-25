@@ -3,8 +3,6 @@ echo "*********************eudev çalıştırıldı ****************************
 /bin/udv
 echo "*********************ek modüller yüklendi ******************************"
 DISK=sda
-debug=false
-
 modprobe loop
 modprobe ext4
 fallback(){
@@ -17,40 +15,37 @@ fallback(){
             exit 1
         fi
 }
-ldconfig
-mkdir -p hedef
-mkdir -p kaynak
-mkdir -p cdrom
-
 echo "*********************disk bölümleri silindi ******************************"
     
-  dd if=/dev/zero of=/dev/${DISK} bs=512 count=1
-    sync && sleep 1
+sfdisk --delete /dev/${DISK}
+sync && sleep 1
+dd if=/dev/zero of=/dev/${DISK} bs=512 count=1
+sync && sleep 1
 
-        yes | parted /dev/${DISK} mktable msdos || fallback
-        yes | parted /dev/${DISK} mkpart primary fat32 1 "1024MB" || fallback
-        yes | parted /dev/${DISK} mkpart primary fat32 1024MB "100%" || fallback
-        sync && sleep 1
-        yes | mkfs.vfat /dev/${DISK}1 || fallback
-        sync && sleep 1
-        yes |e2fsck -f /dev/sda2
-         sync && sleep 1
-	yes |tune2fs -O ^metadata_csum /dev/sda2
-	 sync && sleep 1
-        yes | mkfs.ext4  /dev/${DISK}2 || fallback
-        yes | parted /dev/${DISK} set 1 esp on || fallback
-        sync && sleep 1
-        mount /dev/${DISK}2  /hedef || fallback
-        mkdir -p /hedef/boot 
-        mount /dev/${DISK}1 /hedef/boot || fallback
+echo "********************* disk bölümleri oluşturuldu******************************"
+#sfdisk<disk.layout
+echo -e "label: dos\n,1GiB\n,"|sfdisk /dev/${DISK}
+sync && sleep 1
+yes |mkfs.ext4 /dev/${DISK}2
+sync && sleep 1
+yes |mkfs.vfat /dev/${DISK}1
+sync && sleep 1
 echo "********************* kurulum başladı******************************"
 
 
 
+mkdir -p hedef
+mkdir -p kaynak
+mkdir -p cdrom
 
-
+yes |e2fsck -f /dev/sda2
+yes |tune2fs -O ^metadata_csum /dev/sda2
 mount -t iso9660 -o loop /dev/sr0 cdrom
 mount -t squashfs -o loop /cdrom/live/filesystem.squashfs /kaynak
+mount /dev/sda2 /hedef
+mkdir -p /hedef/boot 
+mount -t vfat /dev/sda1 /hedef/boot
+
 cp -prfv /kaynak/* /hedef/
 cp /cdrom/boot/initrd.img /hedef/boot/initrd.img-$(uname -r)
 cp /cdrom/boot/vmlinuz /hedef/boot/vmlinuz-$(uname -r)

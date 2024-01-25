@@ -1,0 +1,65 @@
+#!/bin/sh
+DISK=sda
+modprobe loop
+modprobe ext4
+
+yes |mkfs.ext4 /dev/sda2
+yes |mkfs.vfat /dev
+
+mkdir -p hedef
+mkdir -p kaynak
+mkdir -p cdrom
+
+yes |e2fsck -f /dev/sda2
+yes |tune2fs -O ^metadata_csum /dev/sda2
+mount -t iso9660 -o loop /dev/sr0 cdrom
+mount -t squashfs -o loop /cdrom/live/filesystem.squashfs /kaynak
+mount /dev/sda2 /hedef
+mkdir -p /hedef/boot 
+mount -t vfat /dev/sda1 /hedef/boot
+
+cp -prfv /kaynak/* /hedef/
+cp /cdrom/boot/initrd.img /hedef/boot/initrd.img-$(uname -r)
+cp /cdrom/boot/vmlinuz /hedef/boot/vmlinuz-$(uname -r)
+cp /hedef/etc/kernel-config /hedef/boot/config-$(uname -r)
+
+
+mkdir -p /hedef/dev
+mkdir -p /hedef/sys
+mkdir -p /hedef/proc
+mkdir -p /hedef/run
+mkdir -p /hedef/tmp
+
+mount --bind /dev /hedef/dev
+mount --bind /sys /hedef/sys
+mount --bind /proc /hedef/proc
+mount --bind /run /hedef/run
+mount --bind /tmp /hedef/tmp
+chroot /hedef /bin/busybox --install -s /bin
+
+chroot /hedef /etc/init.d/agettyinstall
+rm /hedef/etc/init.d/agettyinstall
+
+
+chroot /hedef /usr/sbin/update-initramfs -u -k $(uname -r)
+
+chroot /hedef grub-install --removable --boot-directory=/boot /dev/sda --target=i386-pc
+mkdir -p /hedef/boot/grub
+bid=$(blkid /dev/sda2|cut -d' ' -f2|cut -c 7-42)
+rm -rf /hedef/boot/grub/grub.cfg
+touch /hedef/boot/grub/grub.cfg
+echo "linux /vmlinuz-$(uname -r) init=/usr/sbin/openrc-init root=UUID=${bid} rw quiet">>/hedef/boot/grub/grub.cfg
+echo "initrd /initrd.img-$(uname -r)">>/hedef/boot/grub/grub.cfg
+echo "boot">>/hedef/boot/grub/grub.cfg
+
+chroot /hedef adduser -D -s /bin/sh by -h /home/by
+chroot /hedef echo -e "1\n1\n"|chroot /hedef passwd by
+chroot /hedef echo -e "1\n1\n"|chroot /hedef passwd root
+#umount -f -R /hedef/dev
+#umount -f -R /hedef/sys
+#umount -f -R /hedef/proc
+#umount -f -R /hedef/run
+#umount -f -R /hedef/tmp
+#umount -f -R /hedef/boot
+sync 
+

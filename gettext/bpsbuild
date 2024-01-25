@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+name="gettext"
+version="0.22"
+description="GNU locale utilities"
+source=("https://ftp.gnu.org/gnu/gettext/gettext-${version}.tar.xz")
+depends="libunistring"
+group=(sys.devel)
+bzip2_depends=(bzip2)
+lzma_depends=(xz-utils)
+
+
+setup(){
+    ../${name}-${version}/configure --prefix=/usr \
+        --libdir=/lib64 \
+        --enable-shared \
+        --enable-static \
+        --disable-java \
+        --without-emacs \
+        --without-cvs \
+        --without-included-regex \
+        --without-included-libxml \
+        --without-git \
+        $(use_opt bzip2 --with-bzip2 --without-bzip2) \
+        $(use_opt lzma --with-xz --without-xz)
+}
+
+build(){
+    make
+}
+
+package(){
+    make install DESTDIR=$DESTDIR
+}
+
