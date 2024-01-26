@@ -41,7 +41,7 @@ busybox tar -xf /tmp/bps/kur/rootfs.tar.xz -C /
 #busybox cp -prfv rootfs/* $ROOTFS/ 1>/dev/null 2>/dev/null
 
 #eğer daha kurulmuşsa kayıt siliniyor
-busybox sed -i '/name=\"${paket}\"/d' /var/lib/bps/index.lst
+busybox sed -i "/name=\"${paket}\"/d" /var/lib/bps/index.lst
 #name version depends /var/bps/index.lst eklenmesi
 echo "name=\"${name}\":"version=\"${version}\":"depends=\"${depends}\"">>/var/lib/bps/index.lst
 #paket içinde gelen paket dosyalarının dosya ve dizin yapısını tutan file index dosyanının /var/bps/ konumuna kopyalanması

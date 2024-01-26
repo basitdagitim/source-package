@@ -41,5 +41,6 @@ done
 rm -f /var/lib/bps/${paket}-${version}.lst
 
 #/var/lib/bps/index.lst dosyasından ilgili paket satırı kaldırılır.
-sed -i '/name=\"${paket}\"/d' /var/lib/bps/index.lst
-
+sed -i "/name=\"${paket}\"/d" /var/lib/bps/index.lst
+# sistem guncelleniyor
+ldconfig

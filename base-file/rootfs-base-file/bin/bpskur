@@ -1,6 +1,28 @@
 #!/bin/sh
 #!/bin/sh
 #set -e
+depens_install()
+{
+source /tmp/bps/kur/bpsbuild
+#echo $depends
+IFS=',' read -r -a array <<< "$depends"
+#liste+=("ali")
+#liste+=("veli")
+#array+=("bayram")
+for itempaketname in "${array[@]}"
+do
+depens_paketname="name=\"${itempaketname}\""
+#echo "Bagimli Paket $itempaketname"
+
+itemindexpaket=$(cat /var/lib/bps/index.lst|grep $depens_paketname)
+if [ -z "${itemindexpaket}" ] #indexpaket boşsa kurulmamış demektir.
+then
+echo "Bagimli Paket $itempaketname Yukleniyor"
+bpskur $itempaketname
+fi
+done    	
+}
+
 paket=$1
 paketname="name=\"${paket}\""
 ROOTFS=$2
@@ -21,12 +43,12 @@ else
 	echo "***********Paket Bulunamadı**********"
 	exit
 fi
-
+echo "********** $name Paketi Kuruluyor **********"
 # paketi indirme
 mkdir -p /tmp/bps
 mkdir -p /tmp/bps/kur
 rm -rf /tmp/bps/kur/*
-curl -Lk -o /tmp/bps/kur/${name}-${version}.tar.gz https://github.com/basitdagitim/binary-package/raw/master/${name}/${name}-${version}.bps
+busybox wget -O /tmp/bps/kur/${name}-${version}.tar.gz https://github.com/basitdagitim/binary-package/raw/master/${name}/${name}-${version}.bps 1>/dev/null 2>/dev/null
 mkdir -p /var/lib/bps
 touch /var/lib/bps/index.lst
 cd /tmp/bps/kur/
@@ -35,13 +57,17 @@ cd /tmp/bps/kur/
 tar -xf ${name}-${version}.tar.gz
 mkdir -p rootfs
 tar -xf rootfs.tar.xz -C rootfs
-
+# bagimlilik yükleniyor
+depens_install
 # paketi kurma
-cp -prfv rootfs/* $ROOTFS/
+cp -prfv rootfs/* $ROOTFS/ 1>/dev/null 2>/dev/null
 
 #eğer daha kurulmuşsa kayıt siliniyor
-sed -i '/name=\"${paket}\"/d' /var/lib/bps/index.lst
+sed -i "/name=\"${paket}\"/d" /var/lib/bps/index.lst
 #name version depends /var/bps/index.lst eklenmesi
 echo "name=\"${name}\":"version=\"${version}\":"depends=\"${depends}\"">>/var/lib/bps/index.lst
 #paket içinde gelen paket dosyalarının dosya ve dizin yapısını tutan file index dosyanının /var/bps/ konumuna kopyalanması
-cp file.index /var/lib/bps/${name}-${version}.lst
+cp file.index /var/lib/bps/${name}-${version}.lst  1>/dev/null 2>/dev/null
+# sistem guncelleniyor
+ldconfig
+echo "********** $name Paketi Kuruldu **********"
